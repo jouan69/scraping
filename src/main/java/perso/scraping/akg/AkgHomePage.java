@@ -1,37 +1,29 @@
 package perso.scraping.akg;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import perso.scraping.AbstractHomePage;
 import perso.scraping.AbstractPage;
 
-public class AkgHomePage extends AbstractPage{
+public class AkgHomePage extends AbstractHomePage {
 
-    private final String URL;
-
-    public AkgHomePage(String searchFile) {
-       	super(searchFile);
-    	setSiteProp("akg.properties");
-		URL = siteProp.getProperty("url");
+    public AkgHomePage(final WebDriver driver, String propertyFile) {
+    	super(driver);
+    	setSiteProp(propertyFile);
     }
 
-    public String getUrl() {
-        return URL;
-    }
-    
-    public void typeSearch(){	
+    public void typeSearch(String artist){
         WebElement inputWidget = driver.findElement(By.xpath("//input[@class='ui-autocomplete-input']"));
-        String input = searchProp.getProperty("search");
-        inputWidget.sendKeys(input+ENTER_KEY);
-    }
-
-    public void submitSearch(){	
-        WebElement submitButton = driver.findElement(By.xpath("//div[@id='btn_cerca']/a/img"));
-        submitButton.click();
+        inputWidget.sendKeys(artist+ENTER_KEY);
+    	pause();
     }
 
     public void login(){
-    	
+
+    	goTo();
+
     	verySmallPause();
     	
     	WebElement login = driver.findElement(By.xpath("//input[contains(@id,'LoginField')]"));
@@ -47,12 +39,8 @@ public class AkgHomePage extends AbstractPage{
     	WebElement submitButton = driver.findElement(By.xpath("//div[contains(@id,'LoginBtn')]/a"));
     	submitButton.click();
     	
-    	smallPause();
+    	pause();
     	
     }
-    
-	public void goTo() {
-	    driver.get(URL); 
-	}
 
 }

@@ -1,38 +1,32 @@
 package perso.scraping.scala;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import perso.scraping.AbstractHomePage;
 import perso.scraping.AbstractPage;
 
-public class ScalaHomePage extends AbstractPage{
+public class ScalaHomePage extends AbstractHomePage {
 
-    private final String URL;
+    public ScalaHomePage(final WebDriver driver, final String propertyFile) {
+        super(driver);
+        setSiteProp(propertyFile);
+    }
 
-    public ScalaHomePage(String searchFile) {
-    	super(searchFile);
-    	setSiteProp("scala.properties");
-    	URL = siteProp.getProperty("url");
-    }
-    
-    public String getUrl() {
-        return URL;
-    }
-    
-    public void typeSearch(){	
+    public void typeSearch(String artist) {
         WebElement inputWidget = driver.findElement(By.xpath("//input[@id='ricerca_s']"));
-        String input = searchProp.getProperty("search");
         inputWidget.clear();
-        inputWidget.sendKeys(input);
+        inputWidget.sendKeys(artist + ENTER_KEY);
     }
 
-    public void submitSearch(){	
+    public void login() {
+        goTo();
+    }
+
+    public void submitSearch() {
         WebElement submitButton = driver.findElement(By.xpath("//div[@id='btn_cerca']/a/img"));
         submitButton.click();
     }
-
-	public void goTo() {
-	    driver.get(URL); 
-	}
 
 }

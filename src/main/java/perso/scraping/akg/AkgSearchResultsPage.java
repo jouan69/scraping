@@ -1,27 +1,38 @@
 package perso.scraping.akg;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import perso.scraping.AbstractPage;
+import perso.scraping.AbstractResultPage;
 
-public class AkgSearchResultsPage extends AbstractPage{
+public class AkgSearchResultsPage extends AbstractResultPage {
 
-    public AkgSearchResultsPage(String searchFile) {
-    	super(searchFile);
+    public AkgSearchResultsPage(final WebDriver webDriver, final String artist, final int fromYear, final int toYear) {
+    	super(webDriver, artist, fromYear, toYear);
     }
 
-    public int getResultNumber(){
-    	WebElement nb = driver.findElement(By.xpath("//div[contains(@class,'CT Button ABS 77t0y5n0 g5043fa2')]"));
+	protected void processResult(int entryNb, int pageSize) {
+		int indexInPage = indexInPage(entryNb, pageSize);
+		int pageNumber = pageNumber(entryNb, pageSize);
+		int startFrom = 1;
+		if (entryNb >= startFrom) {
+			get(entryNb, indexInPage, pageNumber);
+		}
+		if (((entryNb % pageSize) == 0)) {
+			log("entryNb",entryNb, "pageNumber",pageNumber,"indexInPage",indexInPage );
+			pageUp();
+		}
+	}
+
+	protected int getResultNumber(){
+    	WebElement nb = driver.findElement(By.xpath("(//div[contains(@id,'KeywordsPnl')]/div[contains(@class,'CT Button ABS')]/a)[1]"));
     	String raw = nb.getText();
     	int resultNumber = extractIntFromString(raw);
     	log("resultNumber",resultNumber);
     	return resultNumber;
     }
-	
-    public int getPageSize() {
+
+	protected int getPageSize() {
     	String raw = driver.findElement(By.xpath("//input[contains(@id,'ItemPerPageDdl')]")).getAttribute("value");
 		int pageSize = extractIntFromString(raw);
     	log("pageSize",pageSize);
@@ -35,12 +46,10 @@ public class AkgSearchResultsPage extends AbstractPage{
 		String xpathExpr = "(//img[contains(@id,'I_img')])["+indexInPage+"]";
 		WebElement thumb = driver.findElement(By.xpath(xpathExpr));
 		// scroll down to thumb
-		//((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", thumb);
 		verySmallPause();
 		thumb.click();
 		
 		// scroll up on details
-		//((JavascriptExecutor)driver).executeScript("scroll(0,0)");
 		smallPause();
 		// title
 		String title = "";
@@ -58,27 +67,22 @@ public class AkgSearchResultsPage extends AbstractPage{
 			title=setYear(title);
 		}
 		
-		takeScreenshot(title);
+		takeScreenshot(title, artist, "AKG");
 		
 		close();
 	
 		// scroll up on details
-		//((JavascriptExecutor)driver).executeScript("scroll(0,0)");
-		
 		smallPause();
 	}
 	
 	private void close() {
-		//a[@class='PopupCloseC']
 		String xpathExpr = "//a[@class='PopupCloseC']";
 		WebElement close = findElement(By.xpath(xpathExpr));
 		close.click();
 	}
 
 	private String getTitle(){
-		//String xpathExpr = "//span[contains(@id,'Title_Lbl')]";
 		String xpathExpr = "//section[contains(@id,'MainPnl')]/div[contains(@id,'TitlePnl')]/div/span[contains(@id,'Title_Lbl')]";
-		//(//span[contains(@id,'Title_Lbl')])[2]
 		WebElement titleData = driver.findElement(By.xpath(xpathExpr));
 		String dataText = titleData.getText();
 		log("gettitle pre-format",dataText);
