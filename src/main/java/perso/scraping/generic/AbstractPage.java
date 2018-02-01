@@ -1,4 +1,4 @@
-package perso.scraping;
+package perso.scraping.generic;
 
 import org.openqa.selenium.WebDriver;
 

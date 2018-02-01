@@ -4,14 +4,13 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
-import perso.scraping.AbstractPage;
-import perso.scraping.AbstractResultPage;
+import perso.scraping.generic.AbstractResultPage;
+import perso.scraping.generic.param.ArtistSearch;
 
 public class BridgeManSearchResultsPage extends AbstractResultPage {
 
-    public BridgeManSearchResultsPage(final WebDriver webDriver, final String artist, final int fromYear, final int toYear) {
-        super(webDriver, artist, fromYear, toYear);
+    public BridgeManSearchResultsPage(WebDriver driver, ArtistSearch artistSearch) {
+        super(driver, artistSearch);
     }
 
     protected void processResult(int entryNb, int pageSize) {

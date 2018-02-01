@@ -1,25 +1,24 @@
 package perso.scraping.akg;
 
-import perso.scraping.AbstractHomePage;
-import perso.scraping.AbstractSearch;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.name.Named;
+import perso.scraping.generic.AbstractHomePage;
+import perso.scraping.generic.AbstractResultPage;
+import perso.scraping.generic.AbstractSearch;
 
 public class AkgSearch extends AbstractSearch {
 
-    public static final String AKG_PROPERTIES = "akg.properties";
-
-    public void search(String artist, int fromYear, int toYear) {
-
-        launchDriver();
-
-        AbstractHomePage homePage = new AkgHomePage(driver, AKG_PROPERTIES);
-        homePage.login();
-        homePage.typeSearch(artist);
-
-        AkgSearchResultsPage akgSearchResultsPage = new AkgSearchResultsPage(driver, artist, fromYear, toYear);
-        akgSearchResultsPage.processResults();
+    @Inject
+    public AkgSearch(@Named("akgHomePage") final AbstractHomePage homePage,
+                     @Named("akgResultPage") final AbstractResultPage resultPage) {
+        super(homePage , resultPage);
     }
 
     public static void main(String[] args) {
-        new AkgSearch().search("guerre",0,2017);
+        Injector injector = Guice.createInjector(new AkgModule());
+        AbstractSearch abstractSearch = injector.getInstance(AkgSearch.class);
+        abstractSearch.search();
     }
 }

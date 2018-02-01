@@ -1,6 +1,7 @@
-package perso.scraping;
+package perso.scraping.generic;
 
 import org.openqa.selenium.WebDriver;
+import perso.scraping.generic.param.ArtistSearch;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,17 +12,18 @@ import java.util.Properties;
 public abstract class AbstractHomePage extends AbstractPage {
 
     protected static final String ENTER_KEY = "\r\n";
-
     protected Properties siteProp;
-
     private static final String RESOURCE_FOLDER = "site/";
+    private final ArtistSearch artistSearch;
 
-    public AbstractHomePage(WebDriver driver) {
+    public AbstractHomePage(WebDriver driver, ArtistSearch artistSearch, String akgProperties) {
         super(driver);
+        this.artistSearch = artistSearch;
+        String path = RESOURCE_FOLDER + akgProperties;
+        setSiteProp(loadProp(path));
     }
 
     public void setSiteProp(String siteFile) {
-
         String path = RESOURCE_FOLDER + siteFile;
         setSiteProp(loadProp(path));
     }
@@ -68,4 +70,15 @@ public abstract class AbstractHomePage extends AbstractPage {
 
     public abstract void login();
 
+    public ArtistSearch getArtistSearch() {
+        return artistSearch;
+    }
+
+    public void typeArtistName() {
+        typeSearch(getArtistName());
+    }
+
+    public String getArtistName() {
+        return artistSearch.getArtistName();
+    }
 }

@@ -1,15 +1,15 @@
 package perso.scraping.akg;
 
 import org.openqa.selenium.*;
-
-import perso.scraping.AbstractPage;
-import perso.scraping.AbstractResultPage;
+import perso.scraping.generic.AbstractPage;
+import perso.scraping.generic.AbstractResultPage;
+import perso.scraping.generic.param.ArtistSearch;
 
 public class AkgSearchResultsPage extends AbstractResultPage {
 
-    public AkgSearchResultsPage(final WebDriver webDriver, final String artist, final int fromYear, final int toYear) {
-    	super(webDriver, artist, fromYear, toYear);
-    }
+	public AkgSearchResultsPage(WebDriver driver, ArtistSearch artistSearch) {
+		super(driver, artistSearch);
+	}
 
 	protected void processResult(int entryNb, int pageSize) {
 		int indexInPage = indexInPage(entryNb, pageSize);

@@ -3,13 +3,13 @@ package perso.scraping.bridgeman;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import perso.scraping.AbstractHomePage;
+import perso.scraping.generic.AbstractHomePage;
+import perso.scraping.generic.param.ArtistSearch;
 
 public class BridgeManHomePage extends AbstractHomePage {
 
-    public BridgeManHomePage(final WebDriver driver, final String propertyFile) {
-    	super(driver);
-    	setSiteProp(propertyFile);
+    public BridgeManHomePage(WebDriver driver, ArtistSearch artistSearch, String bridgemanProperties) {
+        super(driver, artistSearch, bridgemanProperties);
     }
 
     public void typeSearch(String artist){

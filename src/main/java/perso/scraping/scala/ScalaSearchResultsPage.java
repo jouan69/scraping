@@ -3,12 +3,13 @@ package perso.scraping.scala;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import perso.scraping.AbstractResultPage;
+import perso.scraping.generic.AbstractResultPage;
+import perso.scraping.generic.param.ArtistSearch;
 
 public class ScalaSearchResultsPage extends AbstractResultPage {
 
-    public ScalaSearchResultsPage(final WebDriver webDriver, final String artist, final int fromYeat, final int toYear) {
-        super(webDriver, artist, fromYeat, toYear);
+    public ScalaSearchResultsPage(WebDriver driver, ArtistSearch artistSearch) {
+        super(driver, artistSearch);
     }
 
     protected void processResult(int entryNb, int pageSize) {

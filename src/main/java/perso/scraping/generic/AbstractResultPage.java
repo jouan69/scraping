@@ -1,33 +1,29 @@
-package perso.scraping;
+package perso.scraping.generic;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.spi.LoggerFactory;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import perso.scraping.generic.param.ArtistSearch;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class AbstractResultPage extends AbstractPage {
 
-    protected final String artist;
-    protected final int fromYear;
-    protected final int toYear;
+    protected String artist;
+    protected int fromYear;
+    protected int toYear;
 
-    public AbstractResultPage(final WebDriver webDriver, final String artist, final int fromYear, final int toYear) {
-        super(webDriver);
-        this.artist = artist;
-        this.fromYear = fromYear;
-        this.toYear = toYear;
+    public AbstractResultPage(WebDriver driver, ArtistSearch artistSearch) {
+        super(driver);
+        this.artist = artistSearch.getArtistName();
+        this.fromYear = artistSearch.fromYear();
+        this.toYear = artistSearch.toYear();
     }
 
     public void processResults() {

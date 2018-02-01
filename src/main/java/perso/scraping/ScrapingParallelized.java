@@ -4,7 +4,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import perso.scraping.akg.AkgSearch;
 import perso.scraping.bridgeman.BridgeManSearch;
-import perso.scraping.guice.BasicModule;
+import perso.scraping.generic.AbstractSearch;
+import perso.scraping.generic.guice.BasicModule;
 import perso.scraping.scala.ScalaSearch;
 
 import java.util.concurrent.ExecutorService;
@@ -14,13 +15,9 @@ import java.util.concurrent.TimeUnit;
 
 public class ScrapingParallelized {
 
-    private static String recherche = "Marc Chagall";
-    private static int fromYear = 1900;
-    private static int toYear = 1985;
-
     public static void main(String[] args) throws InterruptedException {
 
-        Injector injector = Guice.createInjector(new BasicModule());
+        final Injector injector = Guice.createInjector(new BasicModule());
 
         ExecutorService executorService = new ThreadPoolExecutor(4, 6, 60,
                 TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
@@ -28,7 +25,8 @@ public class ScrapingParallelized {
         executorService.submit(new Runnable() {
             public void run() {
                 System.out.println("debut Search Akg");
-                new AkgSearch().search(recherche, fromYear, toYear);
+                AbstractSearch akgSearch = injector.getInstance(AkgSearch.class);
+                akgSearch.search();
                 System.out.println("fin tache");
             }
         });
@@ -36,7 +34,7 @@ public class ScrapingParallelized {
         executorService.submit(new Runnable() {
             public void run() {
                 System.out.println("debut Search BridgeManSearch");
-                new BridgeManSearch().search(recherche, fromYear, toYear);
+                injector.getInstance(BridgeManSearch.class).search();
                 System.out.println("fin tache");
             }
         });
@@ -44,7 +42,7 @@ public class ScrapingParallelized {
         executorService.submit(new Runnable() {
             public void run() {
                 System.out.println("debut Search Scala");
-                new ScalaSearch().search(recherche, fromYear, toYear);
+                injector.getInstance(ScalaSearch.class).search();
                 System.out.println("fin tache");
             }
         });

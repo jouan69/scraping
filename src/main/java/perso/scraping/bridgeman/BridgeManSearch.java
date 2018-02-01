@@ -1,25 +1,25 @@
 package perso.scraping.bridgeman;
 
-import perso.scraping.AbstractHomePage;
-import perso.scraping.AbstractSearch;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.name.Named;
+import perso.scraping.generic.AbstractHomePage;
+import perso.scraping.generic.AbstractResultPage;
+import perso.scraping.generic.AbstractSearch;
 
 public class BridgeManSearch extends AbstractSearch {
 
-    public static final String BRIDGEMAN_PROPERTIES = "bridgeman.properties";
-
-    public void search(String artist, int fromYear, int toYear) {
-
-        launchDriver();
-
-        AbstractHomePage homePage = new BridgeManHomePage(driver, BRIDGEMAN_PROPERTIES);
-        homePage.login();
-        homePage.typeSearch(artist);
-
-        BridgeManSearchResultsPage b = new BridgeManSearchResultsPage(driver, artist, fromYear, toYear);
-        b.processResults();
+    @Inject
+    public BridgeManSearch(@Named("bridgeManHomePage") final AbstractHomePage homePage,
+                           @Named("bridgeManResultPage") final AbstractResultPage resultPage) {
+        super(homePage, resultPage);
     }
 
     public static void main(String[] args) {
-        new BridgeManSearch().search("Joan Miro", 1893, 1983);
+        Injector injector = Guice.createInjector(new BridgeManModule());
+        AbstractSearch abstractSearch = injector.getInstance(BridgeManSearch.class);
+        abstractSearch.search();
     }
+
 }

@@ -3,15 +3,13 @@ package perso.scraping.scala;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
-import perso.scraping.AbstractHomePage;
-import perso.scraping.AbstractPage;
+import perso.scraping.generic.AbstractHomePage;
+import perso.scraping.generic.param.ArtistSearch;
 
 public class ScalaHomePage extends AbstractHomePage {
-
-    public ScalaHomePage(final WebDriver driver, final String propertyFile) {
-        super(driver);
-        setSiteProp(propertyFile);
+    
+    public ScalaHomePage(WebDriver driver, ArtistSearch artistSearch, String scalaProperties) {
+        super(driver, artistSearch, scalaProperties);
     }
 
     public void typeSearch(String artist) {

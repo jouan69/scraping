@@ -3,8 +3,6 @@ package perso.scraping.scala;
 import org.junit.Before;
 import org.junit.Test;
 
-import perso.scraping.AbstractPage;
-
 public class ScalaTest {
 	
 	ScalaHomePage home;
