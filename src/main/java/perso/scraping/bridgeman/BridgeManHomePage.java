@@ -8,19 +8,10 @@ import perso.scraping.generic.param.ArtistSearch;
 
 public class BridgeManHomePage extends AbstractHomePage {
 
+    private final String xPathInputSearch = "//input[@id='search_filter_text']";
+
     public BridgeManHomePage(WebDriver driver, ArtistSearch artistSearch, String bridgemanProperties) {
         super(driver, artistSearch, bridgemanProperties);
-    }
-
-    public void typeSearch(String artist){
-        WebElement inputWidget = driver.findElement(By.xpath("//input[@id='search_filter_text']"));
-        inputWidget.clear();
-        inputWidget.sendKeys(artist+ENTER_KEY);
-    }
-
-    public void submitSearch(){	
-        WebElement submitButton = driver.findElement(By.xpath("//div[@id='btn_cerca']/a/img"));
-        submitButton.click();
     }
 
     public void login(){
@@ -33,4 +24,7 @@ public class BridgeManHomePage extends AbstractHomePage {
     	submitButton.click();
     }
 
+    public String getxPathInputSearch() {
+        return xPathInputSearch;
+    }
 }

@@ -1,9 +1,7 @@
-package perso.scraping.akg;
+package perso.scraping.gakg.akg;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import perso.scraping.AbstractPage;
 
 public class AkgTest {
 

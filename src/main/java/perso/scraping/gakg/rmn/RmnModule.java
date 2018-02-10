@@ -1,4 +1,4 @@
-package perso.scraping.scala;
+package perso.scraping.gakg.rmn;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -11,31 +11,31 @@ import perso.scraping.generic.driver.DriverFactory;
 import perso.scraping.generic.param.ArtistSearch;
 import perso.scraping.generic.param.ResultPage;
 
-public class ScalaModule extends AbstractModule {
+public class RmnModule extends AbstractModule {
 
-    public static final String SCALA_PROPERTIES = "scala.properties";
+    public static final String RMN_PROPERTIES = "rmn.properties";
 
     protected void configure() {
     }
 
     @Provides
     @Singleton
-    @Named("scalaDriver")
+    @Named("rmnDriver")
     WebDriver getWebDriver() {
         return DriverFactory.getWebDriver(Browser.CHROME);
     }
 
     @Provides
-    @Named("scalaResultPage")
-    ResultPage getScalaResultPage(@Named("scalaDriver") WebDriver driver,
+    @Named("rmnResultPage")
+    ResultPage getRmnResultPage(@Named("rmnDriver") WebDriver driver,
                                   ArtistSearch artistSearch) {
-        return new ScalaSearchResultsPage(driver, artistSearch);
+        return new RmnSearchResultsPage(driver, artistSearch);
     }
 
     @Provides
-    @Named("scalaHomePage")
-    HomePage getScalaHomePage(@Named("scalaDriver") WebDriver driver,
+    @Named("rmnHomePage")
+    HomePage getRmnHomePage(@Named("rmnDriver") WebDriver driver,
                               ArtistSearch artistSearch) {
-        return new ScalaHomePage(driver, artistSearch, SCALA_PROPERTIES);
+        return new RmnHomePage(driver, artistSearch, RMN_PROPERTIES);
     }
 }

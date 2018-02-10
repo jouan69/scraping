@@ -1,5 +1,6 @@
 package perso.scraping.bridgeman;
 
+import java.util.logging.Level;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -7,48 +8,23 @@ import org.openqa.selenium.WebElement;
 import perso.scraping.generic.AbstractResultPage;
 import perso.scraping.generic.param.ArtistSearch;
 
+import java.util.Optional;
+
 public class BridgeManSearchResultsPage extends AbstractResultPage {
+
+    private final String xPathResultNumber = "//span[@class='results-title']";
+    private final String xpathPageSize = "//select[@class='form-control']/option[@selected='selected']";
+    private final String xpathPageUp = "//div[@class='pagination row-section-grey']/a[2]/i[contains(@class,'fa fa-chevron-right')]";
+
+    private final String agency = "BridgeMan";
 
     public BridgeManSearchResultsPage(WebDriver driver, ArtistSearch artistSearch) {
         super(driver, artistSearch);
     }
 
-    protected void processResult(int entryNb, int pageSize) {
-        int indexInPage = indexInPage(entryNb, pageSize);
-        int pageNumber = pageNumber(entryNb, pageSize);
-        int startFrom = 1;
-        if (entryNb >= startFrom) {
-            get(entryNb, indexInPage, pageNumber);
-        }
-        if (((entryNb % pageSize) == 0)) {
-            pageUp();
-        }
-    }
-
-    public int getResultNumber() {
-        WebElement nb = driver.findElement(By.xpath("//span[@class='results-title']"));
-        String raw = nb.getText();
-        int resultNumber = extractIntFromString(raw);
-        log("resultNumber", resultNumber);
-        return resultNumber;
-    }
-
-    public int getPageSize() {
-        WebElement raw = driver.findElement(By.xpath("//select[@class='form-control']/option[@selected='selected']"));
-        int pageSize = extractIntFromString(raw.getText());
-        log("pageSize", pageSize);
-        return pageSize;
-    }
-
-    public void clickFirst() {
-        WebElement img = driver.findElement(By.xpath("(//div[contains(@class,'search-results-wrapper')])[1]/div/span/span/a/img"));
-        img.click();
-        ((JavascriptExecutor) driver).executeScript("scroll(0,330)");
-    }
-
     public void get(int entryNb, int indexInPage, int pageNumber) {
         // open element
-        log("entryNb", entryNb, "pageNumber", pageNumber, "indexInPage", indexInPage);
+        log(Level.INFO,"entryNb", entryNb, "pageNumber", pageNumber, "indexInPage", indexInPage);
         try {
             String xpathExpr = "(//div[contains(@class,'search-results-wrapper')])[" + indexInPage + "]/div/span/span/a/img";
             WebElement thumb = driver.findElement(By.xpath(xpathExpr));
@@ -60,10 +36,10 @@ public class BridgeManSearchResultsPage extends AbstractResultPage {
             xpathExpr = "(//dl/dd[@class='is-special'])[1]";
             WebElement titleData = findElement(By.xpath(xpathExpr));
             String dataText = titleData.getText();
-            String title = formatTitle(dataText);
-            log("title", title);
+            String title = formatTitle(dataText, Optional.empty());
+            log(Level.FINE,"title", title);
 
-            takeScreenshot(title, artist, "BridgeMan");
+            takeScreenshot(title, artist, getAgency());
 
             driver.navigate().back();
         } catch (Exception e) {
@@ -88,17 +64,30 @@ public class BridgeManSearchResultsPage extends AbstractResultPage {
         }
     }
 
-    public void pageUp() {
-        String xpathExpr = "//div[@class='pagination row-section-grey']/a[2]/i";
-        WebElement pageNum = driver.findElement(By.xpath(xpathExpr));
-        pageNum.click();
-    }
-
     public void changeItem() {
         String xpathExpr = "//span[@class='navigation-result-next icon is-active arrow-right-large-pink']";
         WebElement element = driver.findElement(By.xpath(xpathExpr));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
         element.click();
         smallPause();
+    }
+
+    @Override
+    public String getxPathResultNumber() {
+        return xPathResultNumber;
+    }
+
+    @Override
+    public String getXpathPageSize() {
+        return xpathPageSize;
+    }
+
+    @Override
+    public String getXpathPageUp() {
+        return xpathPageUp;
+    }
+
+    public String getAgency() {
+        return agency;
     }
 }

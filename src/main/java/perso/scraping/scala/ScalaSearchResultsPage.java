@@ -1,4 +1,4 @@
-package perso.scraping.scala;
+  package perso.scraping.scala;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -6,13 +6,20 @@ import org.openqa.selenium.WebElement;
 import perso.scraping.generic.AbstractResultPage;
 import perso.scraping.generic.param.ArtistSearch;
 
-public class ScalaSearchResultsPage extends AbstractResultPage {
+import java.util.logging.Level;
+
+  public class ScalaSearchResultsPage extends AbstractResultPage {
+
+    protected final String xPathResultNumber = "(//div[@class='ric-tools adj'])[1]";
+    protected final String xpathPageSize = "//select[@id='selNRisPag']/option[@selected]";
+    private final String agency = "Scala";
 
     public ScalaSearchResultsPage(WebDriver driver, ArtistSearch artistSearch) {
         super(driver, artistSearch);
     }
 
-    protected void processResult(int entryNb, int pageSize) {
+    @Override
+    public void processResult(int entryNb, int pageSize) {
         int indexInPage = indexInPage(entryNb, pageSize);
         int pageNumber = pageNumber(entryNb, pageSize);
         int startFrom = 1;
@@ -31,27 +38,6 @@ public class ScalaSearchResultsPage extends AbstractResultPage {
         }
     }
 
-    public void openFirstItem() {
-        WebElement firstImg = driver.findElement(By.xpath("(//div[@class='res-item'])[1]/div/img"));
-        firstImg.click();
-    }
-
-    public int getResultNumber() {
-        WebElement nb = driver.findElement(By.xpath("(//div[@class='ric-tools adj'])[1]"));
-        String raw = nb.getText();
-        int resultNumber = extractIntFromString(raw);
-        //log("resultNumber",resultNumber);
-        return resultNumber;
-    }
-
-    public int getPageSize() {
-        WebElement nb = driver.findElement(By.xpath("//select[@id='selNRisPag']/option[@selected]"));
-        String raw = nb.getText();
-        int pageSize = extractIntFromString(raw);
-        //log("PageSize",pageSize);
-        return pageSize;
-    }
-
     public void get(int entryNb, int indexInPage, int pageNumber) {
         //
         String xpathExpr = "(//div[@class='item-data'])[" + indexInPage + "]";
@@ -59,7 +45,7 @@ public class ScalaSearchResultsPage extends AbstractResultPage {
         String dataText = data.getText();
         //log("dataText",dataText);
         String title = extractTitle(dataText);
-        log("title", title);
+        log(Level.FINE,"title", title);
         //
         String index = String.valueOf(indexInPage);
         WebElement img = driver.findElement(By.xpath("(//div[@class='res-item'])[" + index + "]/div/img"));
@@ -74,12 +60,14 @@ public class ScalaSearchResultsPage extends AbstractResultPage {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        takeScreenshot(title, artist, "Scala");
+        takeScreenshot(title, artist, getAgency());
         //
         driver.close();
         driver.switchTo().window(winHandleSearchResults);
         // Change page of
     }
+
+    public void pageUp() {}
 
     public void changePage(int pageNumber) {
         String xpathExpr = "(//div[@class='ric-tools-dx']/a[text()='" + pageNumber + "'])[1]";
@@ -94,4 +82,22 @@ public class ScalaSearchResultsPage extends AbstractResultPage {
         pageNum.click();
     }
 
+    @Override
+    public String getxPathResultNumber() {
+        return xPathResultNumber;
+    }
+
+    @Override
+    public String getXpathPageSize() {
+        return xpathPageSize;
+    }
+
+    @Override
+    protected String getXpathPageUp() {
+        return null;
+    }
+
+    public String getAgency() {
+        return agency;
+    }
 }

@@ -1,6 +1,5 @@
-package perso.scraping.akg;
+package perso.scraping.gakg.akg;
 
-import com.google.inject.Inject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -9,16 +8,10 @@ import perso.scraping.generic.param.ArtistSearch;
 
 public class AkgHomePage extends AbstractHomePage {
 
+    private final String xPathInputSearch = "//input[@class='ui-autocomplete-input']";
+
     public AkgHomePage(WebDriver driver, ArtistSearch artistSearch, String akgProperties) {
         super(driver, artistSearch, akgProperties);
-    }
-
-    public void typeSearch(String artist) {
-
-        WebElement inputWidget = driver.findElement(By.xpath("//input[@class='ui-autocomplete-input']"));
-        inputWidget.sendKeys(artist + ENTER_KEY);
-        pause();
-
     }
 
     public void login() {
@@ -44,4 +37,7 @@ public class AkgHomePage extends AbstractHomePage {
 
     }
 
+    public String getxPathInputSearch() {
+        return xPathInputSearch;
+    }
 }

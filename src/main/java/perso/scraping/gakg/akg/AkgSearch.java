@@ -1,18 +1,18 @@
-package perso.scraping.akg;
+package perso.scraping.gakg.akg;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.name.Named;
-import perso.scraping.generic.AbstractHomePage;
-import perso.scraping.generic.AbstractResultPage;
 import perso.scraping.generic.AbstractSearch;
+import perso.scraping.generic.HomePage;
+import perso.scraping.generic.param.ResultPage;
 
 public class AkgSearch extends AbstractSearch {
 
     @Inject
-    public AkgSearch(@Named("akgHomePage") final AbstractHomePage homePage,
-                     @Named("akgResultPage") final AbstractResultPage resultPage) {
+    public AkgSearch(@Named("akgHomePage") final HomePage homePage,
+                     @Named("akgResultPage") final ResultPage resultPage) {
         super(homePage , resultPage);
     }
 

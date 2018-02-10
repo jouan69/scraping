@@ -1,19 +1,19 @@
-package perso.scraping.generic;
+ package perso.scraping.generic;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import perso.scraping.generic.param.ArtistSearch;
+import perso.scraping.generic.param.ResultPage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class AbstractResultPage extends AbstractPage {
+public abstract class AbstractResultPage extends AbstractPage implements ResultPage {
 
     protected String artist;
     protected int fromYear;
@@ -32,24 +32,31 @@ public abstract class AbstractResultPage extends AbstractPage {
         for (int i = 1; i <= nbRslt; i++) {
             try {
                 processResult(i, pageSize);
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 LOGGER.log(Level.INFO, t.getMessage());
             }
 
         }
     }
 
-    abstract protected int getResultNumber();
-
-    abstract protected int getPageSize();
-
-    abstract protected void processResult(int resultIndex, int pageSize);
+    public void processResult(int entryNb, int pageSize) {
+        int indexInPage = indexInPage(entryNb, pageSize);
+        int pageNumber = pageNumber(entryNb, pageSize);
+        int startFrom = 1;
+        if (entryNb >= startFrom) {
+            get(entryNb, indexInPage, pageNumber);
+        }
+        if (((entryNb % pageSize) == 0)) {
+            log(Level.FINE,"entryNb", entryNb, "pageNumber", pageNumber, "indexInPage", indexInPage);
+            pageUp();
+        }
+    }
 
     protected String extractTitle(String s) {
         Pattern p = Pattern.compile("Title:(.*)$");
         Matcher m = p.matcher(s);
         if (m.find()) {
-            return formatTitle(m.group(1));
+            return formatTitle(m.group(1), Optional.empty());
         }
         return null;
     }
@@ -86,8 +93,11 @@ public abstract class AbstractResultPage extends AbstractPage {
     }
 
     protected int extractIntFromString(String s) {
+        String cleaned = s.replaceAll("\\.", "")
+                .replaceAll(",", "")
+                .replaceAll(" ", "");
         Pattern p = Pattern.compile("(\\d+)");
-        Matcher m = p.matcher(s);
+        Matcher m = p.matcher(cleaned);
         if (m.find()) {
             // log("found",m.group(1));
             return Integer.parseInt(m.group(1));
@@ -103,8 +113,7 @@ public abstract class AbstractResultPage extends AbstractPage {
         return entryNb - (pageNumber(entryNb, pageSize) - 1) * pageSize;
     }
 
-    protected String formatTitle(String title) {
-        String yearTxt = extractYearFromString(title);
+    protected String formatTitle(String title, String yearTxt) {
         String shortTitle = title.replaceAll(yearTxt, "");
         shortTitle = shortTitle.replaceAll(",", "");
         shortTitle = shortTitle.replaceAll(";", "");
@@ -126,11 +135,16 @@ public abstract class AbstractResultPage extends AbstractPage {
         return yearTxt + "_" + shortTitle;
     }
 
+    protected String formatTitle(String title, Optional<String> date) {
+        String yearTxt = date.isPresent() ? date.get() : extractYearFromString(title);
+        return formatTitle(title, yearTxt);
+    }
+
     public void takeScreenshot(String title, String artist, String agency) {
         File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         // Now you can do whatever you need to do with it, for example copy
         // somewhere
-        log(" screenshot title", title);
+        log(Level.SEVERE," screenshot title", title);
         try {
             String filePath = "c:\\tmp\\" + agency + "\\" + artist + "\\" + title + ".png";
             File newFile = getUniqueFilename(new File(filePath));
@@ -149,4 +163,43 @@ public abstract class AbstractResultPage extends AbstractPage {
         }
         return file;
     }
+
+    public int getResultNumber() {
+        smallPause();
+        WebElement nb = driver.findElement(By.xpath(getxPathResultNumber()));
+        String raw = nb.getText();
+        int resultNumber = extractIntFromString(raw);
+        log(Level.SEVERE,"resultNumber", resultNumber);
+        return resultNumber;
+    }
+
+    public int getPageSize() {
+        verySmallPause();
+        WebElement raw;
+        try{
+            raw = driver.findElement(By.xpath(getXpathPageSize()));
+            int pageSize = extractIntFromString(raw.getText());
+            log(Level.SEVERE,"pageSize", pageSize);
+            return pageSize;
+        }catch (Exception e){
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public void pageUp() {
+        ((JavascriptExecutor) driver).executeScript("scroll(0,0)");
+        WebElement pageNum = driver.findElement(By.xpath(getXpathPageUp()));
+        pageNum.click();
+        smallPause();
+    }
+
+    protected abstract String getxPathResultNumber();
+
+    protected abstract String getXpathPageSize();
+
+    protected abstract String getXpathPageUp();
+
+    protected abstract String getAgency();
+
 }

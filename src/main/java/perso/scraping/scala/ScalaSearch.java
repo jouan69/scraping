@@ -4,15 +4,15 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.name.Named;
-import perso.scraping.generic.AbstractHomePage;
-import perso.scraping.generic.AbstractResultPage;
 import perso.scraping.generic.AbstractSearch;
+import perso.scraping.generic.HomePage;
+import perso.scraping.generic.param.ResultPage;
 
 public class ScalaSearch extends AbstractSearch {
 
     @Inject
-    public ScalaSearch(@Named("scalaHomePage") final AbstractHomePage homePage,
-                       @Named("scalaResultPage") final AbstractResultPage resultPage) {
+    public ScalaSearch(@Named("scalaHomePage") final HomePage homePage,
+                       @Named("scalaResultPage") final ResultPage resultPage) {
         super(homePage, resultPage);
     }
 

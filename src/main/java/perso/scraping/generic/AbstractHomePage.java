@@ -1,6 +1,8 @@
 package perso.scraping.generic;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import perso.scraping.generic.param.ArtistSearch;
 
 import java.io.File;
@@ -9,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public abstract class AbstractHomePage extends AbstractPage {
+public abstract class AbstractHomePage extends AbstractPage implements HomePage {
 
     protected static final String ENTER_KEY = "\r\n";
     protected Properties siteProp;
@@ -66,7 +68,11 @@ public abstract class AbstractHomePage extends AbstractPage {
         driver.get(siteProp.getProperty("url"));
     }
 
-    public abstract void typeSearch(String artist);
+    public void typeSearch(String artist) {
+        WebElement inputWidget = driver.findElement(By.xpath(getxPathInputSearch()));
+        inputWidget.clear();
+        inputWidget.sendKeys(artist + ENTER_KEY);
+    }
 
     public abstract void login();
 
@@ -81,4 +87,7 @@ public abstract class AbstractHomePage extends AbstractPage {
     public String getArtistName() {
         return artistSearch.getArtistName();
     }
+
+    public abstract String getxPathInputSearch();
+
 }

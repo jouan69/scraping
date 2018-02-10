@@ -1,14 +1,15 @@
 package perso.scraping.generic;
 
 import com.google.inject.Inject;
+import perso.scraping.generic.param.ResultPage;
 
 public abstract class AbstractSearch implements ImageWebSite {
 
-    private final AbstractHomePage homePage;
-    private final AbstractResultPage resultPage;
+    private final HomePage homePage;
+    private final ResultPage resultPage;
 
     @Inject
-    public AbstractSearch(final AbstractHomePage homePage, final AbstractResultPage resultPage) {
+    public AbstractSearch(final HomePage homePage, final ResultPage resultPage) {
         this.homePage = homePage;
         this.resultPage = resultPage;
     }

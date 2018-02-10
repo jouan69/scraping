@@ -2,10 +2,11 @@ package perso.scraping;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import perso.scraping.akg.AkgSearch;
+import perso.scraping.gakg.akg.AkgSearch;
 import perso.scraping.bridgeman.BridgeManSearch;
 import perso.scraping.generic.AbstractSearch;
 import perso.scraping.generic.guice.BasicModule;
+import perso.scraping.gakg.rmn.RmnSearch;
 import perso.scraping.scala.ScalaSearch;
 
 import java.util.concurrent.ExecutorService;
@@ -43,6 +44,14 @@ public class ScrapingParallelized {
             public void run() {
                 System.out.println("debut Search Scala");
                 injector.getInstance(ScalaSearch.class).search();
+                System.out.println("fin tache");
+            }
+        });
+        
+        executorService.submit(new Runnable() {
+            public void run() {
+                System.out.println("debut Search Rmn");
+                injector.getInstance(RmnSearch.class).search();
                 System.out.println("fin tache");
             }
         });
