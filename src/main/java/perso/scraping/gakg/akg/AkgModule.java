@@ -6,10 +6,13 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.openqa.selenium.WebDriver;
 import perso.scraping.generic.HomePage;
+import perso.scraping.generic.PropertiesLoader;
 import perso.scraping.generic.driver.Browser;
 import perso.scraping.generic.driver.DriverFactory;
 import perso.scraping.generic.param.ArtistSearch;
-import perso.scraping.generic.param.ResultPage;
+import perso.scraping.generic.ResultPage;
+
+import java.util.Properties;
 
 public class AkgModule extends AbstractModule {
 
@@ -35,8 +38,10 @@ public class AkgModule extends AbstractModule {
     @Provides
     @Named("akgHomePage")
     HomePage getAkgHomePage(@Named("akgDriver") WebDriver driver,
+                            PropertiesLoader propertyLoader,
                             ArtistSearch artistSearch){
-        return new AkgHomePage(driver, artistSearch, AKG_PROPERTIES);
+        Properties siteProperties = propertyLoader.loadSiteProp(AKG_PROPERTIES);
+        return new AkgHomePage(driver, artistSearch, siteProperties);
     }
 
 }

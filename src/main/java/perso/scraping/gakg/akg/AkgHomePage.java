@@ -6,11 +6,13 @@ import org.openqa.selenium.WebElement;
 import perso.scraping.generic.AbstractHomePage;
 import perso.scraping.generic.param.ArtistSearch;
 
+import java.util.Properties;
+
 public class AkgHomePage extends AbstractHomePage {
 
     private final String xPathInputSearch = "//input[@class='ui-autocomplete-input']";
 
-    public AkgHomePage(WebDriver driver, ArtistSearch artistSearch, String akgProperties) {
+    public AkgHomePage(WebDriver driver, ArtistSearch artistSearch, Properties akgProperties) {
         super(driver, artistSearch, akgProperties);
     }
 

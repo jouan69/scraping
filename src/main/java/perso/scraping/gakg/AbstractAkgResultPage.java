@@ -17,12 +17,13 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
 
     public void get(int entryNb, int indexInPage, int pageNumber) {
         // open element
-        log(Level.FINE,"entryNb", entryNb, "pageNumber", pageNumber, "indexInPage", indexInPage);
+        log(Level.FINE, "entryNb", entryNb, "pageNumber", pageNumber, "indexInPage", indexInPage);
 
-        String xpathExpr = "(//img[contains(@id,'I_img')])[" + indexInPage + "]/parent::a";
+        String xpathExpr = "(//img[contains(@id,'I_img') and not(ancestor::div[contains(@id,'Tooltip')])])[" + indexInPage + "]/parent::a";
         WebElement thumb = driver.findElement(By.xpath(xpathExpr));
-        if(thumb.getAttribute("href").contains("Package")){
-            log(Level.FINER,"Is an album, skip", entryNb);
+        if (thumb.getAttribute("href").contains("Package")) {
+            log(Level.FINER, "Is an album, skip", entryNb);
+            ((JavascriptExecutor) driver).executeScript("arguments[0].style.visibility='hidden'", thumb);
             return;
         }
 
@@ -61,12 +62,12 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
     public int getPageSize() {
         verySmallPause();
         String raw;
-        try{
+        try {
             raw = driver.findElement(By.xpath(getXpathPageSize())).getAttribute("value");
             int pageSize = extractIntFromString(raw);
-            log(Level.SEVERE,"pageSize", pageSize);
+            log(Level.SEVERE, "pageSize", pageSize);
             return pageSize;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return 0;
         }
@@ -98,23 +99,32 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
         xpathExpr += "/span[contains(@id,'CaptionLong_Lbl')]";
         WebElement titleData = driver.findElement(By.xpath(xpathExpr));
         String dataText = titleData.getText();
-        String title = formatTitle(dataText, date);
-        log(Level.FINER,"caption long title", title);
+        Optional<String> myDate = getDateCaptionLong(date, dataText);
+        String title = formatTitle(dataText, myDate);
+        log(Level.FINER, "caption long title", title);
         return title;
+    }
+
+    private Optional<String> getDateCaptionLong(final Optional<String> date, final String dataText) {
+        Optional<String> myDate = date;
+        if (!date.isPresent()) {
+            myDate = Optional.of(extractYearFromString(dataText));
+        }
+        return myDate;
     }
 
     protected String getTitle(final Optional<String> date) {
         String xpathExpr = "//span[contains(@id,'Title_Lbl')]/h1";
         WebElement titleData = driver.findElement(By.xpath(xpathExpr));
         String dataText = titleData.getText();
-        log(Level.FINE,"gettitle pre-format", dataText);
+        log(Level.FINE, "gettitle pre-format", dataText);
         String title = formatTitle(dataText, date);
-        log(Level.FINE,"gettitle detected", title);
+        log(Level.FINE, "gettitle detected", title);
         String restrictions = AbstractPage.UNKNOWN_YEAR + "_RESTRICTIONS";
         if (restrictions.equals(title)) {
             throw new NoSuchElementException(title);
         }
-        log(Level.FINE,"gettitle final", title);
+        log(Level.FINE, "gettitle final", title);
         return title;
     }
 
@@ -125,23 +135,23 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
         xpathExpr += "/span[contains(@id,'CaptionShort_Lbl')]";
         WebElement titleData = driver.findElement(By.xpath(xpathExpr));
         String dataText = titleData.getText();
-        log(Level.FINER,"caption short before formatting", dataText);
+        log(Level.FINER, "caption short before formatting", dataText);
         String title = formatTitle(dataText, date);
-        log(Level.FINER,"caption short title", title);
+        log(Level.FINER, "caption short title", title);
         return title;
     }
 
     protected void moveFocus() {
         // Move cursor
         WebElement currentElement = driver.switchTo().activeElement();
-        ((JavascriptExecutor)driver).executeScript("arguments[0].style.visibility='hidden'", currentElement);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].style.visibility='hidden'", currentElement);
         Robot robot = null;
         try {
             robot = new Robot();
             verySmallPause();
             int x = currentElement.getLocation().getX();
             int y = currentElement.getLocation().getY();
-            robot.mouseMove(0, y+200);
+            robot.mouseMove(0, y + 200);
             verySmallPause();
         } catch (Exception e) {
             e.printStackTrace();
@@ -150,30 +160,30 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
         // Remove f*cking tooltip that hides other elements
         String xpathExpr = "//div[contains(@id,'TooltipPnl')]/div[@class='ABS AvoidBreak VF']/parent::div";
         currentElement = driver.findElement(By.xpath(xpathExpr));
-        ((JavascriptExecutor)driver).executeScript("arguments[0].style.display='none'", currentElement);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].style.display='none'", currentElement);
     }
 
-    protected String setDateToTitle(String year, String title){
+    protected String setDateToTitle(String year, String title) {
         String toReturn = title.replace(AbstractPage.UNKNOWN_YEAR, year);
-        log(Level.FINE,"setDateToTitle",toReturn);
+        log(Level.FINE, "setDateToTitle", toReturn);
         return toReturn;
     }
 
     protected String setYear(String title) {
-        log(Level.FINE,"Before Tile setYear", title);
+        log(Level.FINE, "Before Tile setYear", title);
         String year = AbstractPage.UNKNOWN_YEAR;
         String xpathExpr = "//span[contains(@id,'IssueDateYear_Lbl')]";
         try {
             WebElement yearElement = driver.findElement(By.xpath(xpathExpr));
             year = extractYearFromString(yearElement.getText());
-            log(Level.FINEST,"case1", year);
+            log(Level.FINEST, "case1", year);
             return setDateToTitle(year, title);
         } catch (Exception e1) {
             try {
                 xpathExpr = "//span[contains(@id,'DocYear_Lbl')]";
                 WebElement yearElement = driver.findElement(By.xpath(xpathExpr));
                 year = extractYearFromString(yearElement.getText());
-                log(Level.FINEST,"case2", year);
+                log(Level.FINEST, "case2", year);
                 return setDateToTitle(year, title);
             } catch (Exception e2) {
                 return setDateToTitle(AbstractPage.UNKNOWN_YEAR, title);
@@ -184,11 +194,50 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
     protected Optional<String> getDateField() {
         try {
             String date = driver.findElement(By.xpath("//div[contains(@id,'DatedP')]/div[3]/span")).getText();
-            log(Level.FINER,"date", date);
-            return Optional.of(date);
+            String s = extractYearFromString(date);
+            log(Level.FINER, "date", s);
+            return Optional.of(s);
         } catch (Exception e) {
-            log(Level.FINER,"nodate", null);
-            return Optional.empty();
+            try {
+                String date = driver.findElement(By.xpath("//span[contains(@id,'CaptionLong_Lbl')]")).getText();
+                String extracted = extractYearFromString(date);
+                return Optional.of(extracted);
+            } catch (Exception e2) {
+                return Optional.empty();
+            }
         }
     }
+
+    private int getAlbumNumber() {
+        try {
+            WebElement nb = driver.findElement(By.xpath(getxPathAlbumNumber()));
+            String raw = nb.getText();
+            int resultNumber = extractIntFromString(raw);
+            log(Level.SEVERE, "AlbumNumber", resultNumber);
+            return resultNumber;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    protected abstract String getxPathAlbumNumber();
+
+    public int getResultNumber() {
+        smallPause();
+        int albumNumber = getAlbumNumber();
+        int resultNumber = albumNumber + super.getResultNumber();
+        log(Level.SEVERE, "total resultNumber", resultNumber);
+        return resultNumber;
+    }
+
+    @Override
+    protected void searchPage(int offset, int pageSize) {
+        int entryNb = offset + 1;
+        int pageNumber = pageNumber(entryNb, pageSize);
+        WebElement pageNum = driver.findElement(By.xpath("//input[contains(@id,'TxtPJ')]"));
+        pageNum.clear();
+        pageNum.sendKeys(String.valueOf(pageNumber) + ENTER_KEY);
+        verySmallPause();
+    }
+
 }

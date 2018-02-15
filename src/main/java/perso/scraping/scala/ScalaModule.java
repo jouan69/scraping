@@ -6,10 +6,13 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.openqa.selenium.WebDriver;
 import perso.scraping.generic.HomePage;
+import perso.scraping.generic.PropertiesLoader;
 import perso.scraping.generic.driver.Browser;
 import perso.scraping.generic.driver.DriverFactory;
 import perso.scraping.generic.param.ArtistSearch;
-import perso.scraping.generic.param.ResultPage;
+import perso.scraping.generic.ResultPage;
+
+import java.util.Properties;
 
 public class ScalaModule extends AbstractModule {
 
@@ -35,7 +38,9 @@ public class ScalaModule extends AbstractModule {
     @Provides
     @Named("scalaHomePage")
     HomePage getScalaHomePage(@Named("scalaDriver") WebDriver driver,
+                              PropertiesLoader propertyLoader,
                               ArtistSearch artistSearch) {
-        return new ScalaHomePage(driver, artistSearch, SCALA_PROPERTIES);
+        Properties siteProperties = propertyLoader.loadSiteProp(SCALA_PROPERTIES);
+        return new ScalaHomePage(driver, artistSearch, siteProperties);
     }
 }

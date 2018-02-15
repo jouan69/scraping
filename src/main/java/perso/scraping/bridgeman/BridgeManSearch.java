@@ -6,7 +6,7 @@ import com.google.inject.Injector;
 import com.google.inject.name.Named;
 import perso.scraping.generic.AbstractSearch;
 import perso.scraping.generic.HomePage;
-import perso.scraping.generic.param.ResultPage;
+import perso.scraping.generic.ResultPage;
 
 public class BridgeManSearch extends AbstractSearch {
 

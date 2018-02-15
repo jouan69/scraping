@@ -1,8 +1,8 @@
-package perso.scraping.generic.param;
+package perso.scraping.generic;
 
-public interface ResultPage {
+public interface ResultPage extends WebPage {
 
-    void processResults();
+    void processResults(int offset) throws RestartBrowserException;
 
     int getResultNumber();
 

@@ -1,12 +1,14 @@
 package perso.scraping.generic;
 
 import com.google.inject.Inject;
-import perso.scraping.generic.param.ResultPage;
+import org.openqa.selenium.WebDriver;
 
 public abstract class AbstractSearch implements ImageWebSite {
 
     private final HomePage homePage;
     private final ResultPage resultPage;
+
+    public static final int RESTART_LIMIT = 200;
 
     @Inject
     public AbstractSearch(final HomePage homePage, final ResultPage resultPage) {
@@ -15,8 +17,24 @@ public abstract class AbstractSearch implements ImageWebSite {
     }
 
     public void search() {
+        int offset = 2540;
+        search(offset);
+    }
+
+    private void search(int offset) {
         homePage.login();
         homePage.typeArtistName();
-        resultPage.processResults();
+        try {
+            resultPage.processResults(offset);
+        } catch (RestartBrowserException e) {
+            updateDriver(e.getDriver());
+            offset = e.getIndex();
+            search(offset);
+        }
+    }
+
+    private void updateDriver(WebDriver driver){
+        homePage.setDriver(driver);
+        resultPage.setDriver(driver);
     }
 }

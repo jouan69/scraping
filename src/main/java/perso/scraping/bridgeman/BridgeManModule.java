@@ -7,10 +7,13 @@ import com.google.inject.name.Named;
 import org.openqa.selenium.WebDriver;
 import perso.scraping.generic.HomePage;
 import perso.scraping.generic.ImageWebSite;
+import perso.scraping.generic.PropertiesLoader;
 import perso.scraping.generic.driver.Browser;
 import perso.scraping.generic.driver.DriverFactory;
 import perso.scraping.generic.param.ArtistSearch;
-import perso.scraping.generic.param.ResultPage;
+import perso.scraping.generic.ResultPage;
+
+import java.util.Properties;
 
 public class BridgeManModule extends AbstractModule {
 
@@ -41,7 +44,9 @@ public class BridgeManModule extends AbstractModule {
     @Provides
     @Named("bridgeManHomePage")
     HomePage getBridgeManHomePage(@Named("bridgeManDriver") WebDriver driver,
+                                  PropertiesLoader propertyLoader,
                                   ArtistSearch artistSearch){
-        return new BridgeManHomePage(driver, artistSearch, BRIDGEMAN_PROPERTIES);
+        Properties siteProperties = propertyLoader.loadSiteProp(BRIDGEMAN_PROPERTIES);
+        return new BridgeManHomePage(driver, artistSearch, siteProperties);
     }
 }

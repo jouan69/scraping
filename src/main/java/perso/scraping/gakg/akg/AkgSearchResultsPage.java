@@ -9,6 +9,7 @@ import java.util.Optional;
 public class AkgSearchResultsPage extends AbstractAkgResultPage {
 
     private final String xPathResultNumber = "(//div[contains(@id,'KeywordsPnl')]/div[contains(@class,'CT Button ABS')]/a)[1]";
+    private final String xPathAlbumNumber = "(//div[contains(@id,'KeywordsPnl')]/div[contains(@class,'CT Button ABS')]/a)[2]";
     private final String xpathPageSize = "//input[contains(@id,'ItemPerPageDdl')]";
     private final String xpathPageUp = "//img[contains(@id,'NextBtn_img')]";
 
@@ -27,11 +28,11 @@ public class AkgSearchResultsPage extends AbstractAkgResultPage {
         return xPathResultNumber;
     }
 
-
     @Override
     public String getXpathPageSize() {
         return xpathPageSize;
     }
+
 
     public String getAgency() {
         return agency;
@@ -39,5 +40,9 @@ public class AkgSearchResultsPage extends AbstractAkgResultPage {
 
     public String getXpathPageUp() {
         return xpathPageUp;
+    }
+
+    public String getxPathAlbumNumber() {
+        return xPathAlbumNumber;
     }
 }

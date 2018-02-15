@@ -6,11 +6,13 @@ import org.openqa.selenium.WebElement;
 import perso.scraping.generic.AbstractHomePage;
 import perso.scraping.generic.param.ArtistSearch;
 
+import java.util.Properties;
+
 public class BridgeManHomePage extends AbstractHomePage {
 
     private final String xPathInputSearch = "//input[@id='search_filter_text']";
 
-    public BridgeManHomePage(WebDriver driver, ArtistSearch artistSearch, String bridgemanProperties) {
+    public BridgeManHomePage(WebDriver driver, ArtistSearch artistSearch, Properties bridgemanProperties) {
         super(driver, artistSearch, bridgemanProperties);
     }
 

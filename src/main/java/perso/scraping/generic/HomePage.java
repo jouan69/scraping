@@ -1,6 +1,6 @@
 package perso.scraping.generic;
 
-public interface HomePage {
+public interface HomePage extends WebPage {
 
     void login();
 

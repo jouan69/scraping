@@ -1,10 +1,11 @@
- package perso.scraping.generic;
+package perso.scraping.generic;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.openqa.selenium.*;
+import perso.scraping.generic.driver.Browser;
+import perso.scraping.generic.driver.DriverFactory;
 import perso.scraping.generic.param.ArtistSearch;
-import perso.scraping.generic.param.ResultPage;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +13,8 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static perso.scraping.generic.AbstractSearch.RESTART_LIMIT;
 
 public abstract class AbstractResultPage extends AbstractPage implements ResultPage {
 
@@ -26,28 +29,61 @@ public abstract class AbstractResultPage extends AbstractPage implements ResultP
         this.toYear = artistSearch.toYear();
     }
 
-    public void processResults() {
+    public void processResults(int offset) throws RestartBrowserException {
+
+        smallPause();
+
         int nbRslt = getResultNumber();
         int pageSize = getPageSize();
-        for (int i = 1; i <= nbRslt; i++) {
-            try {
-                processResult(i, pageSize);
-            } catch (Exception t) {
-                LOGGER.log(Level.INFO, t.getMessage());
-            }
 
+        // go to correct page
+        searchPage(offset, pageSize);
+
+        // resume processing
+        for (int i = offset + 1; i <= nbRslt; i++) {
+            processPage(i, pageSize);
+        }
+    }
+
+    protected void searchPage(int offset, int pageSize) {
+        int entryNb = offset + 1;
+        int pageNumber = pageNumber(entryNb, pageSize);
+        //
+        int page = 1;
+        while (page < pageNumber) {
+            pageUp();
+            page++;
+        }
+    }
+
+    private void processPage(int i, int pageSize) throws RestartBrowserException {
+        // processing
+        try {
+            log(Level.SEVERE, "processResult", i, pageSize);
+            processResult(i, pageSize);
+        } catch (Exception t) {
+            log(Level.INFO, t.getMessage());
+        } finally {
+            checkBrowserRestart(i);
+        }
+    }
+
+    private void checkBrowserRestart(int i) throws RestartBrowserException {
+        if (i % RESTART_LIMIT == 0) {
+            driver.quit();
+            WebDriver newDriver = DriverFactory.getWebDriver(Browser.CHROME);
+            throw new RestartBrowserException(newDriver, i);
         }
     }
 
     public void processResult(int entryNb, int pageSize) {
         int indexInPage = indexInPage(entryNb, pageSize);
         int pageNumber = pageNumber(entryNb, pageSize);
-        int startFrom = 1;
-        if (entryNb >= startFrom) {
-            get(entryNb, indexInPage, pageNumber);
-        }
+
+        get(entryNb, indexInPage, pageNumber);
+
         if (((entryNb % pageSize) == 0)) {
-            log(Level.FINE,"entryNb", entryNb, "pageNumber", pageNumber, "indexInPage", indexInPage);
+            log(Level.FINE, "entryNb", entryNb, "pageNumber", pageNumber, "indexInPage", indexInPage);
             pageUp();
         }
     }
@@ -144,13 +180,19 @@ public abstract class AbstractResultPage extends AbstractPage implements ResultP
         File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         // Now you can do whatever you need to do with it, for example copy
         // somewhere
-        log(Level.SEVERE," screenshot title", title);
+        log(Level.SEVERE, " screenshot title", title);
         try {
             String filePath = "c:\\tmp\\" + agency + "\\" + artist + "\\" + title + ".png";
             File newFile = getUniqueFilename(new File(filePath));
             FileUtils.copyFile(scrFile, newFile);
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                FileUtils.forceDelete(scrFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -176,12 +218,12 @@ public abstract class AbstractResultPage extends AbstractPage implements ResultP
     public int getPageSize() {
         verySmallPause();
         WebElement raw;
-        try{
+        try {
             raw = driver.findElement(By.xpath(getXpathPageSize()));
             int pageSize = extractIntFromString(raw.getText());
-            log(Level.SEVERE,"pageSize", pageSize);
+            log(Level.SEVERE, "pageSize", pageSize);
             return pageSize;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return 0;
         }

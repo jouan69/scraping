@@ -6,10 +6,13 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.openqa.selenium.WebDriver;
 import perso.scraping.generic.HomePage;
+import perso.scraping.generic.PropertiesLoader;
 import perso.scraping.generic.driver.Browser;
 import perso.scraping.generic.driver.DriverFactory;
 import perso.scraping.generic.param.ArtistSearch;
-import perso.scraping.generic.param.ResultPage;
+import perso.scraping.generic.ResultPage;
+
+import java.util.Properties;
 
 public class RmnModule extends AbstractModule {
 
@@ -35,7 +38,9 @@ public class RmnModule extends AbstractModule {
     @Provides
     @Named("rmnHomePage")
     HomePage getRmnHomePage(@Named("rmnDriver") WebDriver driver,
-                              ArtistSearch artistSearch) {
-        return new RmnHomePage(driver, artistSearch, RMN_PROPERTIES);
+                            PropertiesLoader propertyLoader,
+                            ArtistSearch artistSearch) {
+        Properties siteProperties = propertyLoader.loadSiteProp(RMN_PROPERTIES);
+        return new RmnHomePage(driver, artistSearch, siteProperties);
     }
 }
