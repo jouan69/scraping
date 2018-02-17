@@ -1,9 +1,10 @@
 package perso.scraping.generic;
 
 import org.openqa.selenium.WebDriver;
+import perso.scraping.logs.MyLogger;
 
+import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public abstract class AbstractPage implements WebPage {
 
@@ -11,7 +12,16 @@ public abstract class AbstractPage implements WebPage {
     protected WebDriver driver;
     protected static final String ENTER_KEY = "\r\n";
 
-    protected Logger LOGGER = Logger.getLogger(AbstractPage.class.getName());
+    protected MyLogger useLogger = new MyLogger();
+
+    static {
+        try {
+            MyLogger.setup();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Problems with creating the log files");
+        }
+    }
 
     public AbstractPage(WebDriver driver) {
         this.driver = driver;
@@ -48,11 +58,11 @@ public abstract class AbstractPage implements WebPage {
             sb.append(i);
             sb.append("} ");
         }
-        LOGGER.log(level, sb.toString(), obj);
+        useLogger.log(level, sb.toString(), obj);
     }
 
     protected void log(String name, Object value) {
-        LOGGER.log(Level.INFO, "{0}={1}", new Object[]{name, value});
+        useLogger.log(Level.INFO, "{0}={1}", new Object[]{name, value});
     }
 
     public void setDriver(WebDriver driver){

@@ -24,7 +24,6 @@ public class BridgeManSearchResultsPage extends AbstractResultPage {
 
     public void get(int entryNb, int indexInPage, int pageNumber) {
         // open element
-        log(Level.INFO,"entryNb", entryNb, "pageNumber", pageNumber, "indexInPage", indexInPage);
         try {
             String xpathExpr = "(//div[contains(@class,'search-results-wrapper')])[" + indexInPage + "]/div/span/span/a/img";
             WebElement thumb = driver.findElement(By.xpath(xpathExpr));
@@ -36,10 +35,11 @@ public class BridgeManSearchResultsPage extends AbstractResultPage {
             xpathExpr = "(//dl/dd[@class='is-special'])[1]";
             WebElement titleData = findElement(By.xpath(xpathExpr));
             String dataText = titleData.getText();
-            String title = formatTitle(dataText, Optional.empty());
+            Optional<String> descrDate = getDateDescription(dataText);
+            String title = formatTitle(dataText, descrDate);
             log(Level.FINE,"title", title);
 
-            takeScreenshot(title, artist, getAgency());
+            takeScreenshot(entryNb, title, artist, getAgency());
 
             driver.navigate().back();
         } catch (Exception e) {
@@ -49,6 +49,18 @@ public class BridgeManSearchResultsPage extends AbstractResultPage {
 
         smallPause();
 
+    }
+
+    private Optional<String> getDateDescription(String dataText) {
+        try{
+            String xpathExpr = "//dt[contains(text(),'Description')]/following-sibling::dd[1]";
+            WebElement element = driver.findElement(By.xpath(xpathExpr));
+            String descr = element.getText();
+            String year = extractYearFromString(descr);
+            return UNKNOWN_YEAR.equals(year) ? Optional.empty() : Optional.of(year);
+        }catch (Exception e){
+            return Optional.empty();
+        }
     }
 
     private WebElement findElement(By xpath) {

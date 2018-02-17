@@ -1,15 +1,17 @@
 package perso.scraping.gakg.akg;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import perso.scraping.gakg.AbstractAkgResultPage;
 import perso.scraping.generic.param.ArtistSearch;
 
 import java.util.Optional;
+import java.util.logging.Level;
 
 public class AkgSearchResultsPage extends AbstractAkgResultPage {
 
     private final String xPathResultNumber = "(//div[contains(@id,'KeywordsPnl')]/div[contains(@class,'CT Button ABS')]/a)[1]";
-    private final String xPathAlbumNumber = "(//div[contains(@id,'KeywordsPnl')]/div[contains(@class,'CT Button ABS')]/a)[2]";
     private final String xpathPageSize = "//input[contains(@id,'ItemPerPageDdl')]";
     private final String xpathPageUp = "//img[contains(@id,'NextBtn_img')]";
 
@@ -17,6 +19,15 @@ public class AkgSearchResultsPage extends AbstractAkgResultPage {
 
     public AkgSearchResultsPage(WebDriver driver, ArtistSearch artistSearch) {
         super(driver, artistSearch);
+    }
+
+    public int getResultNumber() {
+        smallPause();
+        WebElement nb = driver.findElement(By.xpath(getxPathResultNumber()));
+        String raw = nb.getText();
+        int resultNumber = extractIntFromString(raw);
+        log(Level.INFO, "total resultNumber", resultNumber);
+        return resultNumber;
     }
 
     public Optional<String> getDateField() {
@@ -42,7 +53,4 @@ public class AkgSearchResultsPage extends AbstractAkgResultPage {
         return xpathPageUp;
     }
 
-    public String getxPathAlbumNumber() {
-        return xPathAlbumNumber;
-    }
 }

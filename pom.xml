@@ -125,14 +125,51 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>perso.scraping.ScrapingRmn</mainClass>
-                    <!--<arguments>
-                        <argument>foo</argument>
-                        <argument>bar</argument>
-                    </arguments>-->
+                    <mainClass>${class.to.launch}</mainClass>
                 </configuration>
             </plugin>
 
         </plugins>
     </build>
+
+    <properties>
+        <class.to.launch>perso.scraping.ScrapingRmn</class.to.launch>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>scala</id>
+            <properties>
+                <class.to.launch>perso.scraping.ScrapingScala</class.to.launch>
+            </properties>
+        </profile>
+    </profiles>
+
+    <profiles>
+        <profile>
+            <id>rmn</id>
+            <properties>
+                <class.to.launch>perso.scraping.ScrapingRmn</class.to.launch>
+            </properties>
+        </profile>
+    </profiles>
+
+    <profiles>
+        <profile>
+            <id>bridgeman</id>
+            <properties>
+                <class.to.launch>perso.scraping.ScrapingBridgeMan</class.to.launch>
+            </properties>
+        </profile>
+    </profiles>
+
+    <profiles>
+        <profile>
+            <id>akg</id>
+            <properties>
+                <class.to.launch>perso.scraping.ScrapingAkg</class.to.launch>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>

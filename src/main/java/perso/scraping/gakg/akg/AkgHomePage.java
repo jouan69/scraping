@@ -23,20 +23,21 @@ public class AkgHomePage extends AbstractHomePage {
         verySmallPause();
 
         WebElement login = driver.findElement(By.xpath("//input[contains(@id,'LoginField')]"));
+        login.clear();
         login.sendKeys(siteProp.getProperty("login"));
 
         verySmallPause();
 
         WebElement passWord = driver.findElement(By.xpath("//input[contains(@id,'Password')]"));
-        passWord.sendKeys(siteProp.getProperty("password"));
+        passWord.clear();
+        passWord.sendKeys(siteProp.getProperty("password") + ENTER_KEY);
 
         verySmallPause();
 
-        WebElement submitButton = driver.findElement(By.xpath("//div[contains(@id,'LoginBtn')]/a"));
-        submitButton.click();
+        // search this on page after login
+        WebElement link = driver.findElement(By.xpath("//div[contains(@class,'CT Slideshow ABS')]"));
 
-        pause();
-
+        verySmallPause();
     }
 
     public String getxPathInputSearch() {

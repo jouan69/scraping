@@ -1,8 +1,12 @@
 package perso.scraping.gakg.rmn;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import perso.scraping.gakg.AbstractAkgResultPage;
 import perso.scraping.generic.param.ArtistSearch;
+
+import java.util.logging.Level;
 
 public class RmnSearchResultsPage extends AbstractAkgResultPage {
 
@@ -13,6 +17,28 @@ public class RmnSearchResultsPage extends AbstractAkgResultPage {
     private final String agency = "RMN";
     public RmnSearchResultsPage(WebDriver driver, ArtistSearch artistSearch) {
         super(driver, artistSearch);
+    }
+
+    public int getResultNumber() {
+        smallPause();
+        int albumNumber = getAlbumNumber();
+        WebElement nb = driver.findElement(By.xpath(getxPathResultNumber()));
+        String raw = nb.getText();
+        int resultNumber = albumNumber + extractIntFromString(raw);
+        log(Level.SEVERE, "total resultNumber", resultNumber);
+        return resultNumber;
+    }
+
+    private int getAlbumNumber() {
+        try {
+            WebElement nb = driver.findElement(By.xpath(getxPathAlbumNumber()));
+            String raw = nb.getText();
+            int resultNumber = extractIntFromString(raw);
+            log(Level.SEVERE, "AlbumNumber", resultNumber);
+            return resultNumber;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     @Override

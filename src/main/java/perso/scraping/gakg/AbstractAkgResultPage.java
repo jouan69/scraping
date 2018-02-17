@@ -6,6 +6,8 @@ import perso.scraping.generic.AbstractResultPage;
 import perso.scraping.generic.param.ArtistSearch;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -22,7 +24,7 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
         String xpathExpr = "(//img[contains(@id,'I_img') and not(ancestor::div[contains(@id,'Tooltip')])])[" + indexInPage + "]/parent::a";
         WebElement thumb = driver.findElement(By.xpath(xpathExpr));
         if (thumb.getAttribute("href").contains("Package")) {
-            log(Level.FINER, "Is an album, skip", entryNb);
+            log(Level.SEVERE, "Is an album, skip", entryNb);
             ((JavascriptExecutor) driver).executeScript("arguments[0].style.visibility='hidden'", thumb);
             return;
         }
@@ -50,7 +52,7 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
             title = setYear(title);
         }
 
-        takeScreenshot(title, artist, getAgency());
+        takeScreenshot(entryNb, title, artist, getAgency());
 
         close();
 
@@ -65,7 +67,7 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
         try {
             raw = driver.findElement(By.xpath(getXpathPageSize())).getAttribute("value");
             int pageSize = extractIntFromString(raw);
-            log(Level.SEVERE, "pageSize", pageSize);
+            log(Level.INFO, "pageSize", pageSize);
             return pageSize;
         } catch (Exception e) {
             e.printStackTrace();
@@ -157,10 +159,13 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
             e.printStackTrace();
         }
 
-        // Remove f*cking tooltip that hides other elements
-        String xpathExpr = "//div[contains(@id,'TooltipPnl')]/div[@class='ABS AvoidBreak VF']/parent::div";
-        currentElement = driver.findElement(By.xpath(xpathExpr));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].style.display='none'", currentElement);
+        // if not album
+        if (!currentElement.getAttribute("href").contains("Package")) {
+            // Remove f*cking tooltip that hides other elements
+            String xpathExpr = "//div[contains(@id,'TooltipPnl')]/div[@class='ABS AvoidBreak VF']/parent::div";
+            currentElement = driver.findElement(By.xpath(xpathExpr));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].style.display='none'", currentElement);
+        }
     }
 
     protected String setDateToTitle(String year, String title) {
@@ -208,27 +213,7 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
         }
     }
 
-    private int getAlbumNumber() {
-        try {
-            WebElement nb = driver.findElement(By.xpath(getxPathAlbumNumber()));
-            String raw = nb.getText();
-            int resultNumber = extractIntFromString(raw);
-            log(Level.SEVERE, "AlbumNumber", resultNumber);
-            return resultNumber;
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
-    protected abstract String getxPathAlbumNumber();
-
-    public int getResultNumber() {
-        smallPause();
-        int albumNumber = getAlbumNumber();
-        int resultNumber = albumNumber + super.getResultNumber();
-        log(Level.SEVERE, "total resultNumber", resultNumber);
-        return resultNumber;
-    }
+    public abstract int getResultNumber();
 
     @Override
     protected void searchPage(int offset, int pageSize) {

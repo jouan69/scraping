@@ -59,10 +59,9 @@ public abstract class AbstractResultPage extends AbstractPage implements ResultP
     private void processPage(int i, int pageSize) throws RestartBrowserException {
         // processing
         try {
-            log(Level.SEVERE, "processResult", i, pageSize);
             processResult(i, pageSize);
         } catch (Exception t) {
-            log(Level.INFO, t.getMessage());
+            log(Level.SEVERE, "[", i, "]", t.getMessage());
         } finally {
             checkBrowserRestart(i);
         }
@@ -70,6 +69,7 @@ public abstract class AbstractResultPage extends AbstractPage implements ResultP
 
     private void checkBrowserRestart(int i) throws RestartBrowserException {
         if (i % RESTART_LIMIT == 0) {
+            log(Level.SEVERE, "Restarting driver", i);
             driver.quit();
             WebDriver newDriver = DriverFactory.getWebDriver(Browser.CHROME);
             throw new RestartBrowserException(newDriver, i);
@@ -176,23 +176,21 @@ public abstract class AbstractResultPage extends AbstractPage implements ResultP
         return formatTitle(title, yearTxt);
     }
 
-    public void takeScreenshot(String title, String artist, String agency) {
+    public void takeScreenshot(int entry, String title, String artist, String agency) {
         File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-        // Now you can do whatever you need to do with it, for example copy
-        // somewhere
-        log(Level.SEVERE, " screenshot title", title);
+        File newFile;
+        String filePath = "c:\\tmp\\" + agency + "\\" + artist + "\\" + title + ".png";
         try {
-            String filePath = "c:\\tmp\\" + agency + "\\" + artist + "\\" + title + ".png";
-            File newFile = getUniqueFilename(new File(filePath));
+            newFile = getUniqueFilename(new File(filePath));
             FileUtils.copyFile(scrFile, newFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                FileUtils.forceDelete(scrFile);
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (newFile.exists()) {
+                log(Level.INFO, "[", entry, "]", newFile.getName());
+            } else {
+                log(Level.SEVERE, entry, newFile.getName(), " not exists");
             }
+            FileUtils.forceDelete(scrFile);
+        } catch (IOException e) {
+            log(Level.SEVERE, entry, title, "NOK", e.getMessage());
         }
     }
 
@@ -211,7 +209,7 @@ public abstract class AbstractResultPage extends AbstractPage implements ResultP
         WebElement nb = driver.findElement(By.xpath(getxPathResultNumber()));
         String raw = nb.getText();
         int resultNumber = extractIntFromString(raw);
-        log(Level.SEVERE,"resultNumber", resultNumber);
+        log(Level.INFO, "resultNumber", resultNumber);
         return resultNumber;
     }
 
@@ -221,7 +219,7 @@ public abstract class AbstractResultPage extends AbstractPage implements ResultP
         try {
             raw = driver.findElement(By.xpath(getXpathPageSize()));
             int pageSize = extractIntFromString(raw.getText());
-            log(Level.SEVERE, "pageSize", pageSize);
+            log(Level.INFO, "pageSize", pageSize);
             return pageSize;
         } catch (Exception e) {
             e.printStackTrace();

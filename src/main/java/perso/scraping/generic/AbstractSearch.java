@@ -8,7 +8,7 @@ public abstract class AbstractSearch implements ImageWebSite {
     private final HomePage homePage;
     private final ResultPage resultPage;
 
-    public static final int RESTART_LIMIT = 200;
+    public static final int RESTART_LIMIT = 100;
 
     @Inject
     public AbstractSearch(final HomePage homePage, final ResultPage resultPage) {
@@ -17,7 +17,7 @@ public abstract class AbstractSearch implements ImageWebSite {
     }
 
     public void search() {
-        int offset = 2540;
+        int offset = 100;
         search(offset);
     }
 
