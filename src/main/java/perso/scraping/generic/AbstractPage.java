@@ -9,6 +9,7 @@ import java.util.logging.Level;
 public abstract class AbstractPage implements WebPage {
 
     protected static final String UNKNOWN_YEAR = "UnknownYear";
+    protected static final String UNKNOWN_TITLE = UNKNOWN_YEAR + "_UnknownTitle";
     protected WebDriver driver;
     protected static final String ENTER_KEY = "\r\n";
 
@@ -53,7 +54,7 @@ public abstract class AbstractPage implements WebPage {
 
     public void log(Level level, Object... obj) {
         StringBuilder sb = new StringBuilder();
-        for (int i=0;i<obj.length;i++) {
+        for (int i = 0; i < obj.length; i++) {
             sb.append("{");
             sb.append(i);
             sb.append("} ");
@@ -65,7 +66,7 @@ public abstract class AbstractPage implements WebPage {
         useLogger.log(Level.INFO, "{0}={1}", new Object[]{name, value});
     }
 
-    public void setDriver(WebDriver driver){
+    public void setDriver(WebDriver driver) {
         this.driver = driver;
     }
 }

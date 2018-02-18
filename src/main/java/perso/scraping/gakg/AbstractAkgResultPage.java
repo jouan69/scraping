@@ -43,7 +43,11 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
             try {
                 title = getCaptionShort(date);
             } catch (Exception e2) {
-                title = getCaptionLong(date);
+                try{
+                    title = getCaptionLong(date);
+                }catch (Exception e3){
+                    title = UNKNOWN_TITLE;
+                }
             }
         }
         // data
