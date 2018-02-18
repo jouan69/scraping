@@ -29,7 +29,7 @@ public abstract class AbstractResultPage extends AbstractPage implements ResultP
         this.toYear = artistSearch.toYear();
     }
 
-    public void processResults(int offset) throws RestartBrowserException {
+    public void processResults(int fromPage) throws RestartBrowserException {
 
         smallPause();
 
@@ -37,16 +37,16 @@ public abstract class AbstractResultPage extends AbstractPage implements ResultP
         int pageSize = getPageSize();
 
         // go to correct page
-        searchPage(offset, pageSize);
+        searchPage(fromPage, pageSize);
 
         // resume processing
-        for (int i = offset + 1; i <= nbRslt; i++) {
+        for (int i = fromPage; i <= nbRslt; i++) {
             processPage(i, pageSize);
         }
     }
 
     protected void searchPage(int offset, int pageSize) {
-        int entryNb = offset + 1;
+        int entryNb = offset;
         int pageNumber = pageNumber(entryNb, pageSize);
         //
         int page = 1;
@@ -57,26 +57,22 @@ public abstract class AbstractResultPage extends AbstractPage implements ResultP
     }
 
     private void processPage(int i, int pageSize) throws RestartBrowserException {
-        // processing
-        try {
-            processResult(i, pageSize);
-        } catch (Exception t) {
-            log(Level.SEVERE, "[", i, "]", t.getMessage());
-        } finally {
-            checkBrowserRestart(i);
-        }
-    }
-
-    private void checkBrowserRestart(int i) throws RestartBrowserException {
+        processResult(i, pageSize);
         if (i % RESTART_LIMIT == 0) {
-            log(Level.SEVERE, "Restarting driver", i);
-            driver.quit();
-            WebDriver newDriver = DriverFactory.getWebDriver(Browser.CHROME);
-            throw new RestartBrowserException(newDriver, i);
+            restartBrowser(i);
         }
     }
 
-    public void processResult(int entryNb, int pageSize) {
+    protected void restartBrowser(int i) throws RestartBrowserException {
+        log(Level.SEVERE, "Restarting driver", i);
+        driver.quit();
+        smallPause();
+        WebDriver newDriver = DriverFactory.getWebDriver(Browser.CHROME);
+        smallPause();
+        throw new RestartBrowserException(newDriver, i+1);
+    }
+
+    public void processResult(int entryNb, int pageSize) throws RestartBrowserException {
         int indexInPage = indexInPage(entryNb, pageSize);
         int pageNumber = pageNumber(entryNb, pageSize);
 

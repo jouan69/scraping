@@ -37,7 +37,7 @@ public class ScalaSearchResultsPage extends AbstractResultPage {
         for (String winHandle : driver.getWindowHandles()) {
             driver.switchTo().window(winHandle);
         }
-        pause();
+        smallPause();
         takeScreenshot(entryNb, title, artist, getAgency());
         driver.close();
         driver.switchTo().window(winHandleSearchResults);
@@ -49,7 +49,7 @@ public class ScalaSearchResultsPage extends AbstractResultPage {
 
     @Override
     protected void searchPage(int offset, int pageSize) {
-        int targetPageNumber = pageNumber(offset + 1, pageSize);
+        int targetPageNumber = pageNumber(offset, pageSize);
         for (int page = 1; page < targetPageNumber; page++) {
             nextPage(page);
         }
@@ -69,6 +69,7 @@ public class ScalaSearchResultsPage extends AbstractResultPage {
         String xpathExpr = "(//div[@class='ric-tools-dx']/a[text()='" + pageNumber + "'])[1]";
         WebElement pageNum = driver.findElement(By.xpath(xpathExpr));
         pageNum.click();
+        smallPause();
     }
 
 

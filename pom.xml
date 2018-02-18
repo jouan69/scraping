@@ -143,27 +143,18 @@
                 <class.to.launch>perso.scraping.ScrapingScala</class.to.launch>
             </properties>
         </profile>
-    </profiles>
-
-    <profiles>
         <profile>
             <id>rmn</id>
             <properties>
                 <class.to.launch>perso.scraping.ScrapingRmn</class.to.launch>
             </properties>
         </profile>
-    </profiles>
-
-    <profiles>
         <profile>
             <id>bridgeman</id>
             <properties>
                 <class.to.launch>perso.scraping.ScrapingBridgeMan</class.to.launch>
             </properties>
         </profile>
-    </profiles>
-
-    <profiles>
         <profile>
             <id>akg</id>
             <properties>
@@ -171,5 +162,4 @@
             </properties>
         </profile>
     </profiles>
-
 </project>

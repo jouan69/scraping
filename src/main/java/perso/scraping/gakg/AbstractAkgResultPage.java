@@ -3,11 +3,10 @@ package perso.scraping.gakg;
 import org.openqa.selenium.*;
 import perso.scraping.generic.AbstractPage;
 import perso.scraping.generic.AbstractResultPage;
+import perso.scraping.generic.RestartBrowserException;
 import perso.scraping.generic.param.ArtistSearch;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -17,7 +16,7 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
         super(driver, artistSearch);
     }
 
-    public void get(int entryNb, int indexInPage, int pageNumber) {
+    public void get(int entryNb, int indexInPage, int pageNumber) throws RestartBrowserException {
         // open element
         log(Level.FINE, "entryNb", entryNb, "pageNumber", pageNumber, "indexInPage", indexInPage);
 
@@ -56,7 +55,7 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
 
         close();
 
-        moveFocus();
+        moveFocus(entryNb, thumb);
 
         smallPause();
     }
@@ -143,15 +142,14 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
         return title;
     }
 
-    protected void moveFocus() {
+    protected void moveFocus(int entryNb, WebElement currentElement) throws RestartBrowserException {
         // Move cursor
-        WebElement currentElement = driver.switchTo().activeElement();
+        //WebElement currentElement = driver.switchTo().activeElement();
         ((JavascriptExecutor) driver).executeScript("arguments[0].style.visibility='hidden'", currentElement);
         Robot robot = null;
         try {
             robot = new Robot();
             verySmallPause();
-            int x = currentElement.getLocation().getX();
             int y = currentElement.getLocation().getY();
             robot.mouseMove(0, y + 200);
             verySmallPause();
@@ -162,9 +160,20 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
         // if not album
         if (!currentElement.getAttribute("href").contains("Package")) {
             // Remove f*cking tooltip that hides other elements
-            String xpathExpr = "//div[contains(@id,'TooltipPnl')]/div[@class='ABS AvoidBreak VF']/parent::div";
-            currentElement = driver.findElement(By.xpath(xpathExpr));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].style.display='none'", currentElement);
+            try{
+                // DBG
+                String xpathExpr = "//div[contains(@id,'TooltipPnl')]/div[@class='ABS AvoidBreak VF']/parent::div";
+                currentElement = driver.findElement(By.xpath(xpathExpr));
+                ((JavascriptExecutor) driver).executeScript("arguments[0].style.display='none'", currentElement);
+                //throw new IllegalArgumentException("DBG");
+            }catch (Exception e){
+                if(e instanceof RestartBrowserException){
+                    /// do not
+                }else{
+                    log(Level.SEVERE, "Error closing Tooltip", entryNb);
+                    restartBrowser(entryNb);
+                }
+            }
         }
     }
 
@@ -216,8 +225,7 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
     public abstract int getResultNumber();
 
     @Override
-    protected void searchPage(int offset, int pageSize) {
-        int entryNb = offset + 1;
+    protected void searchPage(int entryNb, int pageSize) {
         int pageNumber = pageNumber(entryNb, pageSize);
         WebElement pageNum = driver.findElement(By.xpath("//input[contains(@id,'TxtPJ')]"));
         pageNum.clear();

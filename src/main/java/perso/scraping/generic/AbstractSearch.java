@@ -17,19 +17,19 @@ public abstract class AbstractSearch implements ImageWebSite {
     }
 
     public void search() {
-        int offset = 100;
-        search(offset);
+        int offset = 1300;
+        search(offset+1);
     }
 
-    private void search(int offset) {
+    private void search(int fromPage) {
         homePage.login();
         homePage.typeArtistName();
         try {
-            resultPage.processResults(offset);
+            resultPage.processResults(fromPage);
         } catch (RestartBrowserException e) {
             updateDriver(e.getDriver());
-            offset = e.getIndex();
-            search(offset);
+            fromPage = e.getIndex();
+            search(fromPage);
         }
     }
 

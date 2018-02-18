@@ -8,9 +8,9 @@ public interface ResultPage extends WebPage {
 
     int getPageSize();
 
-    void processResult(int entryNb, int pageSize);
+    void processResult(int entryNb, int pageSize) throws RestartBrowserException;
 
-    void get(int entryNb, int indexInPage, int pageNumber);
+    void get(int entryNb, int indexInPage, int pageNumber) throws RestartBrowserException;
 
     void pageUp();
 }
