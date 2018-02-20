@@ -175,7 +175,8 @@ public abstract class AbstractAkgResultPage extends AbstractResultPage {
                     /// do not
                 }else{
                     log(Level.SEVERE, "Error closing Tooltip", entryNb);
-                    restartBrowser(entryNb);
+                    smallPause();
+                    //restartBrowser(entryNb);
                 }
             }
         }

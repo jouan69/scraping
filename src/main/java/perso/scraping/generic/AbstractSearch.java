@@ -17,8 +17,8 @@ public abstract class AbstractSearch implements ImageWebSite {
     }
 
     public void search() {
-        int offset = 1999;
-        search(offset+1);
+        int offset = 0;
+        search(offset + 1);
     }
 
     private void search(int fromPage) {
@@ -33,7 +33,7 @@ public abstract class AbstractSearch implements ImageWebSite {
         }
     }
 
-    private void updateDriver(WebDriver driver){
+    private void updateDriver(WebDriver driver) {
         homePage.setDriver(driver);
         resultPage.setDriver(driver);
     }
